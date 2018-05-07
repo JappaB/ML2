@@ -129,7 +129,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 207,
+   "execution_count": 1,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -323,7 +323,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 208,
+   "execution_count": 2,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -359,7 +359,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 209,
+   "execution_count": 3,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -401,7 +401,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 210,
+   "execution_count": 4,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -418,9 +418,9 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "[0.50451083 0.49548917]\n",
-      "[0.24436544 0.39225148 0.36338308]\n",
-      "[0.20250478 0.2429495  0.23350645 0.32103928]\n"
+      "[0.45856814 0.54143186]\n",
+      "[0.36175429 0.34308075 0.29516496]\n",
+      "[0.29424634 0.34038943 0.16475423 0.20061   ]\n"
      ]
     }
    ],
@@ -432,7 +432,7 @@
     "            P = np.sum(P, i)\n",
     "    \n",
     "    total = np.sum(P)\n",
-    "    # assert 0.99999 < total < 1.00001, 'The marginal does not sum to 1: {} | {}'.format(total, P)\n",
+    "    assert 0.99999 < total < 1.00001, 'The marginal does not sum to 1: {}'.format(total)\n",
     "    return P\n",
     "    \n",
     "# Lets try it\n",
@@ -474,7 +474,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 211,
+   "execution_count": 5,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -500,18 +500,14 @@
     "def can_send_message(sender, receiver):\n",
     "    '''Checks whether all the non-receiving neighbours have sent their messages to the sender. \n",
     "       (ie. whether all information needed for the outgoing message has been received)'''\n",
+    "    n_incomming = len(sender.in_msgs.values())\n",
+    "    n_neighbours = len(sender.neighbours)\n",
     "    \n",
-    "    for node in sender.neighbours:\n",
-    "        if node == receiver:\n",
-    "            continue\n",
-    "        if node not in sender.in_msgs.keys():\n",
-    "            return False\n",
-    "    \n",
-    "    return True\n",
+    "    return n_incomming == n_neighbours - 1\n",
     "\n",
     "# Do the results make sense?\n",
     "print (can_send_message(X, X_prior))\n",
-    "print (can_send_message(X_prior, X))"
+    "print (can_send_message(X_prior, X))\n"
    ]
   },
   {
@@ -535,7 +531,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 212,
+   "execution_count": 6,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -564,7 +560,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 213,
+   "execution_count": 7,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -583,6 +579,10 @@
     "    messages = []\n",
     "    for node in sender.neighbours:\n",
     "        if node is not receiver:\n",
+    "            \n",
+    "            #TODO Remove print\n",
+    "            print(\"Node:\", node)\n",
+    "            \n",
     "            messages.append(sender.in_msgs[node])\n",
     "\n",
     "    return messages"
@@ -597,7 +597,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 214,
+   "execution_count": 8,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -636,7 +636,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 215,
+   "execution_count": 9,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -675,7 +675,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 216,
+   "execution_count": 10,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -706,7 +706,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 217,
+   "execution_count": 11,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -740,7 +740,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 218,
+   "execution_count": 12,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -754,7 +754,16 @@
      "solution": false
     }
    },
-   "outputs": [],
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Node: X\n",
+      "Node: Z\n"
+     ]
+    }
+   ],
    "source": [
     "### Test test test\n",
     "# message from X_prior to X\n",
@@ -803,7 +812,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 219,
+   "execution_count": 13,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -819,20 +828,21 @@
    "source": [
     "def calc_sum_product_variable_to_factor_msg(variable, factor):\n",
     "    \n",
-    "    # Leaf node\n",
+    "    # leaf nodes send a one for every possible state\n",
     "    if len(variable.neighbours) == 1:\n",
-    "        message = np.ones(variable.num_states)\n",
-    "    # Regular node\n",
+    "        msg = np.ones(variable.num_states)\n",
     "    else:\n",
+    "        \n",
+    "        # Get incomming messages\n",
     "        message = calc_other_neighbour_msg_prod(variable, factor)\n",
-    "    \n",
-    "    return message\n",
+    "\n",
+    "        return message\n",
     "    "
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 220,
+   "execution_count": 14,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -866,7 +876,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 221,
+   "execution_count": 15,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -880,7 +890,16 @@
      "solution": false
     }
    },
-   "outputs": [],
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Node: p(X)\n",
+      "Node: p(Z)\n"
+     ]
+    }
+   ],
    "source": [
     "### Test test test\n",
     "Y_cond.reset()\n",
@@ -922,7 +941,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 222,
+   "execution_count": 16,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -935,7 +954,30 @@
      "solution": false
     }
    },
-   "outputs": [],
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Node: p(X)\n",
+      "Node: p(Z)\n",
+      "Node: X\n",
+      "Node: Z\n"
+     ]
+    },
+    {
+     "ename": "AssertionError",
+     "evalue": "Cannot send message!",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mAssertionError\u001b[0m                            Traceback (most recent call last)",
+      "\u001b[0;32m<ipython-input-16-e00599ea2c88>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     15\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     16\u001b[0m \u001b[0;31m# Backward pass\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 17\u001b[0;31m \u001b[0mY\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend_sp_msg\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mY_cond\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     18\u001b[0m \u001b[0mY_cond\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend_sp_msg\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     19\u001b[0m \u001b[0mY_cond\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend_sp_msg\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mZ\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m<ipython-input-14-d863ef439056>\u001b[0m in \u001b[0;36mvariable_send_sp_msg\u001b[0;34m(self, factor)\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m     \u001b[0;32massert\u001b[0m \u001b[0misinstance\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mfactor\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mFactor\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"Variable can only send messages to factor!\"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 5\u001b[0;31m     \u001b[0;32massert\u001b[0m \u001b[0mcan_send_message\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mfactor\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"Cannot send message!\"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      6\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m     \u001b[0mout_msg\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcalc_sum_product_variable_to_factor_msg\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mfactor\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mAssertionError\u001b[0m: Cannot send message!"
+     ]
+    }
+   ],
    "source": [
     "X_prior.reset()\n",
     "X.reset()\n",
@@ -984,7 +1026,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 223,
+   "execution_count": null,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -1000,8 +1042,8 @@
    "source": [
     "def marginal(self):\n",
     "    \n",
-    "    # Marginal is the prodcut of all incomming messages\n",
-    "    marginal = np.multiply.reduce(list(self.in_msgs.values()))\n",
+    "    # YOUR CODE HERE\n",
+    "    raise NotImplementedError()\n",
     "    \n",
     "    return marginal\n",
     "\n",
@@ -1010,7 +1052,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 224,
+   "execution_count": null,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -1076,7 +1118,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 225,
+   "execution_count": null,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -1094,16 +1136,15 @@
     "def receive_msg(self, other, msg):\n",
     "    self.in_msgs[other] = msg\n",
     "    \n",
-    "    for node in self.neighbours:\n",
-    "        if node is not other:\n",
-    "            self.pending.add(node)\n",
+    "    # YOUR CODE HERE\n",
+    "    raise NotImplementedError()\n",
     "    \n",
     "Node.receive_msg = receive_msg\n"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 226,
+   "execution_count": null,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -1141,7 +1182,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 237,
+   "execution_count": null,
    "metadata": {
     "deletable": false,
     "nbgrader": {
@@ -1155,27 +1196,16 @@
    },
    "outputs": [],
    "source": [
-    "def single_pass(node_list):\n",
-    "    for i, node in enumerate(node_list):\n",
-    "        \n",
-    "        # Final node in the list cannot do the forward pass\n",
-    "        if i == len(node_list):\n",
-    "            break\n",
-    "        \n",
-    "        for receiver in list(node.pending):\n",
-    "            # send all pending messages\n",
-    "            if can_send_message(node, receiver):\n",
-    "                node.send_sp_msg(receiver)\n",
-    "                print(node.name, '-->', receiver.name)\n",
-    "\n",
     "def sum_product(node_list):\n",
-    "    single_pass(node_list)\n",
-    "    single_pass(list(reversed(node_list)))"
+    "    \n",
+    "    # YOUR CODE HERE\n",
+    "    raise NotImplementedError()\n",
+    "    "
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 238,
+   "execution_count": null,
    "metadata": {
     "deletable": false,
     "editable": false,
@@ -1189,24 +1219,7 @@
      "solution": false
     }
    },
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "p(X) --> X\n",
-      "X --> p(Y|X,Z)\n",
-      "p(Z) --> Z\n",
-      "Z --> p(Y|X,Z)\n",
-      "p(Y|X,Z) --> Y\n",
-      "Y --> p(Y|X,Z)\n",
-      "p(Y|X,Z) --> Z\n",
-      "p(Y|X,Z) --> X\n",
-      "Z --> p(Z)\n",
-      "X --> p(X)\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "### Test test test\n",
     "nodes = [X_prior, X, Z_prior, Z, Y_cond, Y]\n",
@@ -2065,7 +2078,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.4"
+   "version": "3.6.3"
   }
  },
  "nbformat": 4,
